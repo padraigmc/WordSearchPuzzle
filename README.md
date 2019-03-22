@@ -1,6 +1,7 @@
 # WordSearchPuzzle
 CS4222 Software Development – Programming Assignment
 Introduction
+
 For this project you are working on a Word Search puzzle and developing a class that will be used to generate puzzles using a two-dimensional grid. A skeletal class for the puzzle is shown below
 public class WordSearchPuzzle {
 	private char[][] puzzle ;
