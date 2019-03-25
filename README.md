@@ -96,8 +96,9 @@ NOTE:	ONLY .java files and any text files required should be placed in your ASSI
 Submissions must be received on or before 16h00 Thursday 11 April 2019 (GMT). 
 This project accounts for 25% of the overall marks available for the module.
 
+# Sample Output
+
 ```
-Sample Output
 
 PUZZLE
 ------
