@@ -47,7 +47,7 @@ public class WordSearchPuzzle {
 }
 ```
 
-Methods Required
+# Methods Required
 The class should support/provide the following operations
 
 - The class provides an operation that returns the list of words used in the puzzle. The header is as follows
