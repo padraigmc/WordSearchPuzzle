@@ -329,12 +329,7 @@ public class WordSearchPuzzle {
             }
 
             for (int l = 0; l < words.size(); l++) {
-                // if the previous word hasn't been placed then a new grid will be generated
-                //if (test == 'n') {
-                //   break;
-                //}
-
-                String wordToBePlaced = words.get(l);
+               String wordToBePlaced = words.get(l);
                 for (int m = 0; m < dim*dim; m++) {
                     
                     // Random coordinates
