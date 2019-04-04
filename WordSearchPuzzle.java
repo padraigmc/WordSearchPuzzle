@@ -101,6 +101,19 @@ public class WordSearchPuzzle {
 
         return ws;
     }
+    
+    /**
+     * 
+     * @return  Arraylist containing the answers for the puzzle
+     */
+    public String getAnswersAsString() {
+        String ws = "";
+        for (int i = 0; i < answers.size(); i++) {
+            ws = ws + answers.get(i) + "\n";
+        }
+        
+        return ws;
+    }
 
     /**
      * Prints the word search to the screen.
