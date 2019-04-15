@@ -275,7 +275,7 @@ public class WordSearchPuzzle {
      * @see <code>testLength</code>
      * @see <code>testClash</code>
      */
-    public void placeWord(int row, int col, char orientation,String word) {
+    public void placeWord(int row, int col, char orientation, String word) {
         switch(orientation) {
             case 'r':
                 for (int i = 0; i < word.length(); i++) {
