@@ -1,15 +1,26 @@
+/**
+ * @author Pádraig McCarthy
+ * @author Bandile Tshabalala
+ * @author Aaron Foster
+ */
+
 import java.util.*;
 
 public class driver {    
     public static void main(String[] args) { 
         
-        WordSearchPuzzle driver = new WordSearchPuzzle("wordFile.txt", 5, 5, 6);
-        driver.generateWordSearchPuzzle();
-        System.out.println("\n~ P U Z Z L E ~");
+        
+        System.out.println("\n~ P U Z Z L E ~\nWords read from file.");
         System.out.println("Unused spaces filed and answers below.\n");
-        driver.showWordSearchPuzzle(false);
+        
+        WordSearchPuzzle fromText = new WordSearchPuzzle("wordFile.txt", 5, 6, 7);
+        fromText.generateWordSearchPuzzle();
+        fromText.showWordSearchPuzzle(false);
 
 
+        System.out.println("\n~ P U Z Z L E ~");
+        System.out.println("Unused spaces filed and answers hidden.\nThe words sorted in order of length:");
+        
         ArrayList<String> food = new ArrayList<String>();
 
         food.add("beef");
@@ -18,16 +29,24 @@ public class driver {
         food.add("beans");
         food.add("wheat");
         food.add("flour");
-
+        
         WordSearchPuzzle ws = new WordSearchPuzzle(food);
         ws.generateWordSearchPuzzle();
-        System.out.println("\n~ P U Z Z L E ~");
-        System.out.println("Unused spaces filed and answers hidden.\nThe words sorted in order of length:");
+        
+        String puzzle = ws.getPuzzleAsString();
+        System.out.println("\n" + puzzle);
+
         for (int i = 0; i < ws.getWordSearchList().size(); i++) {
             System.out.println(ws.getWordSearchList().get(i));
         }
-        String puzzle = ws.getPuzzleAsString();
-        System.out.println("\n\n" + puzzle);
-
+        
+        
+        System.out.println("\n~ P U Z Z L E ~");
+        System.out.println("Empty list supplied by the user:");
+        
+        ArrayList<String> countries = new ArrayList<String>();
+        WordSearchPuzzle ws1 = new WordSearchPuzzle(countries);
+        ws1.generateWordSearchPuzzle();
+        ws1.showWordSearchPuzzle(false);
     }
 }
