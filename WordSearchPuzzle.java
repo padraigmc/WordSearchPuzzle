@@ -36,10 +36,10 @@ public class WordSearchPuzzle {
 
     /**
      * Constructor method. Reads a file (one word per line) and outputs each line that is longer and shorter than the
-     * shortest and longest params to an arraylist. Words are then removed to set length to wordCount and sorted from 
+     * shortest and longest params to an ArrayList. Words are then removed to set length to wordCount and sorted from 
      * longest to shortest.
      * 
-     * @param filename  Name of file in the same directory as src files. This should include ".txt"
+     * @param filename  Name of file in the same directory as src files. This should be like "*filename*.txt"
      * @param wordCount Number of words to be taken from the .txt
      * @param shortest  The length of the shortest word to be used
      * @param longest   The length of the longest word to be used
@@ -64,15 +64,15 @@ public class WordSearchPuzzle {
             aBufferReader.close();
             aFileReader.close();
 
-            // if the user supplies a .txt with no words in it, words are added to the list automatically
-            if (!wordsFromFile.isEmpty()) {
+            
+            if (wordsFromFile.size() > 0) {
                 wordsFromFile = reduceToWordCount(wordsFromFile, wordCount);
-            } else {
+            } else {    // if the user supplies a .txt with no words in it, words are added to the list automatically
                 System.out.println("Empty file given...");
                 System.out.println("Adding words now...");
                 addWords(wordsFromFile);
             }
-            ArrayListToUpperCase(wordsFromFile);
+            
             words = sortLongestFirst(wordsFromFile);
         }
         catch(IOException x) {
@@ -128,7 +128,7 @@ public class WordSearchPuzzle {
     /**
      * Prints the word search to the screen.
      * 
-     * @param hide  If false, the puzzle and the answers will be printed. IF true, the answers will be hidden.
+     * @param hide  If false, the puzzle and the answers will be printed. If true, the answers will be hidden.
      * @see <code>getPuzzleAsString</code>
      */
     public void showWordSearchPuzzle(boolean hide) {
@@ -149,16 +149,10 @@ public class WordSearchPuzzle {
      * @return          The new, saller arraylist       
      */
     public ArrayList<String> reduceToWordCount(ArrayList<String> original, int newLength) {
-        if (original.size() < newLength) {
-            System.out.println("Provided list shorter than wordcount, adding words now...");
-            addWords(original);
-        } else {
-            while (original.size() > newLength +1) {
-                int random = (int) (Math.random() * original.size());
-                original.remove(random);
-            }
+        while (original.size() > newLength) {
+            int random = (int) (Math.random() * original.size());
+            original.remove(random);
         }
-        
         return original;
     }
 
@@ -358,24 +352,21 @@ public class WordSearchPuzzle {
      * @see <code>placeWord</code>
      */
     public boolean getCoord(String word) {
-        boolean result = false;
-        
         ArrayList<Integer> direction = new ArrayList<Integer>(Arrays.asList(0, 1, 2, 3));
         Collections.shuffle(direction);
 
 		for (int i = 0; i < 4; i++) {
             int orientation = direction.get(i);
             
-            // generates new coordinates & tests a placement
             for (int j = 0; j < dim*dim; j++) {
-				
+                
+                // generates new coordinates & tests a placement
 				int row = (int) (Math.random() * dim);
                 int col = (int) (Math.random() * dim);
                 
 				char test = testLength(row, col, word, orientation);
 
 				if (test != 'n') {
-                   // switch to place char in a given position
                     placeWord(row, col, test, word);
                     // adds word to the answer list
                     answers.add(word.toUpperCase() + "[" + row + "][" + col + "]" + Character.toUpperCase(test));
@@ -383,11 +374,11 @@ public class WordSearchPuzzle {
                 }
 			}
 		}
-		return result;
+		return false;
 	} 
     
     /**
-     * Creates and generates the dimensions of the grid, places each word into the grid and populates remaining spaces with random chars
+     * Calculates the dimensions of the grid and creates it, places each word into the grid and populates remaining spaces with random chars
      * 
      * @see <code>calcDim</code>
      * @see <code>testLength</code>
@@ -431,12 +422,12 @@ public class WordSearchPuzzle {
      * @see <code>sortLongestFirst</code>
      */
     public void addWords(ArrayList<String> input) {
-        input.add("compile");
-        input.add("android");
-        input.add("boolean");
-        input.add("stack");
-        input.add("binary");
-        input.add("python");
+        input.add("COMPILE");
+        input.add("ANDROID");
+        input.add("BOOLEAN");
+        input.add("STACK");
+        input.add("BINARY");
+        input.add("PYTHON");
         sortLongestFirst(input);
     }
 }
