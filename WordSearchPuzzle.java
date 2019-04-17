@@ -3,6 +3,7 @@
  * @author Bandile Tshabalala
  * @author Aaron Foster
  */
+import java.util.function.UnaryOperator;
 import java.util.*;
 import java.io.* ;
 
@@ -22,26 +23,29 @@ public class WordSearchPuzzle {
      * @see <code>addWords</code>
      */
     public WordSearchPuzzle(ArrayList<String> input) {
-        if (input.size() > 0) {
-            words = sortLongestFirst(input);
-        } else {
+        if (input.size() <= 0) {
             System.out.println("No words found...\nPopulating list now...");
             addWords(input);
-            words = input;
         }
+
+        // changes all words to upperccase in the user inputted list
+        ArrayListToUpperCase(input);
+        sortLongestFirst(input);
+        words = sortLongestFirst(input);
     }
 
     /**
      * Constructor method. Reads a file (one word per line) and outputs each line that is longer and shorter than the
-     * shortest and longest params to an arraylist. Words are then removed to set length to wordCount and sorted from 
+     * shortest and longest params to an ArrayList. Words are then removed to set length to wordCount and sorted from 
      * longest to shortest.
      * 
-     * @param filename  Name of file in the same directory as src files. This should include ".txt"
+     * @param filename  Name of file in the same directory as src files. This should be like "*filename*.txt"
      * @param wordCount Number of words to be taken from the .txt
      * @param shortest  The length of the shortest word to be used
      * @param longest   The length of the longest word to be used
      * @see <code>reduceToWordCount</code>
      * @see <code>sortLongestFirst</code>
+     * @see <code>addWords</code>
      */
     public WordSearchPuzzle(String filename, int wordCount, int shortest, int longest) {
         ArrayList<String> wordsFromFile = new ArrayList<String>();;
@@ -60,12 +64,20 @@ public class WordSearchPuzzle {
             aBufferReader.close();
             aFileReader.close();
 
-            wordsFromFile = reduceToWordCount(wordsFromFile, wordCount);
+            
+            if (wordsFromFile.size() > 0) {
+                wordsFromFile = reduceToWordCount(wordsFromFile, wordCount);
+            } else {    // if the user supplies a .txt with no words in it, words are added to the list automatically
+                System.out.println("Empty file given...");
+                System.out.println("Adding words now...");
+                addWords(wordsFromFile);
+            }
+            
             words = sortLongestFirst(wordsFromFile);
         }
         catch(IOException x) {
-            addWords(wordsFromFile);
-            words = wordsFromFile;
+            System.out.println("Failed to read file, populating wordlist now...");
+            addWords(words);
         }
     }
     
@@ -97,33 +109,31 @@ public class WordSearchPuzzle {
             }
             ws = ws + "\n";
         }
-
-
         return ws;
     }
-    
+
     /**
      * 
      * @return  Arraylist containing the answers for the puzzle
      */
     public String getAnswersAsString() {
-        String ws = "";
+        String ans = "";
         for (int i = 0; i < answers.size(); i++) {
-            ws = ws + answers.get(i) + "\n";
+            ans = ans + answers.get(i) + "\n";
         }
         
-        return ws;
+        return ans;
     }
 
     /**
      * Prints the word search to the screen.
      * 
-     * @param hide  If false, the puzzle and the answers will be printed. IF true, the answers will be hidden.
+     * @param hide  If false, the puzzle and the answers will be printed. If true, the answers will be hidden.
      * @see <code>getPuzzleAsString</code>
      */
     public void showWordSearchPuzzle(boolean hide) {
         System.out.println(getPuzzleAsString());
-        if (hide == false) {
+        if (!hide) {
             for (int i = 0; i < answers.size(); i++) {
                 System.out.println(answers.get(i));
             }
@@ -131,14 +141,15 @@ public class WordSearchPuzzle {
     }
 
     /**
-     * Randomly remove words from the arraylist to reduce its length to the wordcount.
+     * Randomly remove words from the arraylist to reduce its length to the wordcount. Adds words if length of original
+     * list is shorter than the wordcount.
      * 
      * @param original  Arraylist to be reduced in size
      * @param newLength The arraylist's new length after execution
      * @return          The new, saller arraylist       
      */
     public ArrayList<String> reduceToWordCount(ArrayList<String> original, int newLength) {
-        while (original.size() >= newLength) {
+        while (original.size() > newLength) {
             int random = (int) (Math.random() * original.size());
             original.remove(random);
         }
@@ -146,10 +157,23 @@ public class WordSearchPuzzle {
     }
 
     /**
+     * Converts all Strings in the supplied ArrayList to uppercase.
+     * 
+     * @param input String ArrayList to be converted
+     * @return      ArrayList in uppercase
+     */
+    public ArrayList<String> ArrayListToUpperCase(ArrayList<String> input) {
+        UnaryOperator<String> uo = (x) -> x.toUpperCase();
+        input.replaceAll(uo);
+        return input;
+    }
+   
+
+    /**
      * Sorts list from longest to shortest
      * 
-     * @param original
-     * @return
+     * @param original  String ArrayList to be sorted
+     * @return          Sorted ArrayList
      */
     public ArrayList<String> sortLongestFirst(ArrayList<String> original) {
         Collections.sort(original, Comparator.comparing(String::length));
@@ -172,49 +196,47 @@ public class WordSearchPuzzle {
     }
 
     /**
-     * Tests if the word can be placed in the grid at the supplied coordinates. Tests for all orientations
+     * Tests if the word can be placed in the grid at the supplied coordinates given an orientation.
      * 
-     * @param row   Row in grid to be tested.
-     * @param col   Column in grid to be tested.
-     * @param word  Word to be tested.
+     * @param row           Row in grid to be tested.
+     * @param col           Column in grid to be tested.
+     * @param word          Word to be tested.
+     * @param orientation   Orientation of the word.
      * @return Char signifying the orientation ('r' for left to right, 'l' for right to left, 'd' for bottom to top and 'u' for bottom to top)
      * @see <code>testClash</code>
      */
-    public char testLength(int row, int col, String word) {
-        char dir = 'n';
-        for (int i = 0; i < 4; i++) {
-            int orientation = (int) (Math.random() * 4);
-            
-            if (word.length() <= dim) {
-                switch (orientation) {
-                    case 0: // left to right
-                        if (col + word.length() <= grid.length && testClash(row, col, 'r', word) == true) {
-                            return 'r';
-                        } else {
-                            break;
-                        }
-                    case 1: // right to left
-                        if (col - word.length() + 1 >= 0 && testClash(row, col, 'l', word) == true) {
-                            return 'l';
-                        } else {
-                            break;
-                        }
-                    case 2: // up to down
-                        if (row + word.length() <= grid.length && testClash(row, col, 'd', word) == true) {
-                            return 'd';
-                        } else {
-                            break;
-                        }
-                    default: // down to up
-                        if (row - word.length() + 1 >= 0  && testClash(row, col, 'u', word) == true) {
-                            return 'u';
-                        } else {
-                            break;
-                        }
-                }
-            }
-        }     
-        return dir;
+    public char testLength(int row, int col, String word, int orientation) {
+        if (word.length() <= dim) {
+
+			switch (orientation) {
+				case 0: // left to right
+					if (col + word.length() <= grid.length && testClash(row, col, 'r', word) == true) {
+						return 'r';
+					} else {
+						break;
+					}
+				case 1: // right to left
+					if (col - word.length() + 1 >= 0 && testClash(row, col, 'l', word) == true) {
+						return 'l';
+					} else {
+						break;
+					}
+				case 2: // up to down
+					if (row + word.length() <= grid.length && testClash(row, col, 'd', word) == true) {
+						return 'd';
+					} else {
+						break;
+					}
+				default: // down to up
+					if (row - word.length() + 1 >= 0  && testClash(row, col, 'u', word) == true) {
+						return 'u';
+					} else {
+						break;
+					}
+			}
+		}     
+		// if test fails, 'n' returned
+        return 'n';
     }
     
     /**
@@ -229,6 +251,7 @@ public class WordSearchPuzzle {
      */
     public boolean testClash(int row, int col, char orientation, String word) {
         boolean noClash = true;         // presume word does NOT clash
+        
         switch(orientation) {
             case 'r': // left to right
                 for (int i = 0; i < word.length(); i++) {
@@ -263,6 +286,21 @@ public class WordSearchPuzzle {
                 }
           }
         return noClash;
+    }
+    
+    /**
+     * Populates unused positions in the wordsearch grid with random characters
+     */
+    public void fillUnused() {
+        for (int i = 0; i < dim; i++) {
+            for (int j = 0; j < dim; j++) {
+                if (grid[i][j] == BLANK_CHAR) {
+                    // Generates random char from A - Z using the ASCII representation of chars.
+                    grid[i][j] = (char) (Math.random() * 26 + 'A');
+                }
+            }
+            
+        }
     }
     
     /**
@@ -303,24 +341,44 @@ public class WordSearchPuzzle {
             
         }
     }
-
-    /**
-     * Populates unused positions in the wordsearch grid with random characters
-     */
-    public void fillUnused() {
-        for (int i = 0; i < dim; i++) {
-            for (int j = 0; j < dim; j++) {
-                if (grid[i][j] == BLANK_CHAR) {
-                    // Generates random number from 65 - 90 and casts to char (ASCII table A-Z)
-                    grid[i][j] = (char) (Math.random() * 25 + 66);
-                }
-            }
-            
-        }
-    }
     
     /**
-     * Creates and generates the dimensions of the grid, places each word into the grid and populates remaining spaces with random chars
+     * Method randomly selects an orientation and tests the word placement for many coordinates with that orientation.
+     * If the word can be placed, it is written into the puzzle.
+     * 
+     * @param word  Word to be tested and placed.
+     * @return      Boolean value whether the word placement was successfull or not
+     * @see <code>testLength</code>
+     * @see <code>placeWord</code>
+     */
+    public boolean getCoord(String word) {
+        ArrayList<Integer> direction = new ArrayList<Integer>(Arrays.asList(0, 1, 2, 3));
+        Collections.shuffle(direction);
+
+		for (int i = 0; i < 4; i++) {
+            int orientation = direction.get(i);
+            
+            for (int j = 0; j < dim*dim; j++) {
+                
+                // generates new coordinates & tests a placement
+				int row = (int) (Math.random() * dim);
+                int col = (int) (Math.random() * dim);
+                
+				char test = testLength(row, col, word, orientation);
+
+				if (test != 'n') {
+                    placeWord(row, col, test, word);
+                    // adds word to the answer list
+                    answers.add(word.toUpperCase() + "[" + row + "][" + col + "]" + Character.toUpperCase(test));
+                    return true;
+                }
+			}
+		}
+		return false;
+	} 
+    
+    /**
+     * Calculates the dimensions of the grid and creates it, places each word into the grid and populates remaining spaces with random chars
      * 
      * @see <code>calcDim</code>
      * @see <code>testLength</code>
@@ -328,9 +386,9 @@ public class WordSearchPuzzle {
      */
     public void generateWordSearchPuzzle() {
         calcDim();
-        char test = '0';
 
-        for (int i = 0; i < 100; i++) {
+		// creates new grid
+		for (int i = 0; i < 100; i++) {
             grid = new char[dim][dim];
             answers = new ArrayList<String>();
             
@@ -340,27 +398,20 @@ public class WordSearchPuzzle {
                     grid[j][k] = BLANK_CHAR;
                 }
             }
-
+			
+			// move to next word
             for (int l = 0; l < words.size(); l++) {
-                String wordToBePlaced = words.get(l);
-                for (int m = 0; m < dim*dim; m++) {
-                    
-                    // Random coordinates
-                    int row = (int) (Math.random() * dim);
-                    int col = (int) (Math.random() * dim);
-                    
-                    // Test fit and clash
-                    test = testLength(row, col, wordToBePlaced);
-                    if (test != 'n') {
-                        placeWord(row, col, test, wordToBePlaced);
-                        answers.add(wordToBePlaced.toUpperCase() + "[" + row + "][" + col + "]" + Character.toUpperCase(test));
-                        break;
-                    }
+				String wordToBePlaced = words.get(l);
+				
+				// loop through orientations
+				if (!getCoord(wordToBePlaced)) {
+                    break;
                 }
             }
+            
             if (answers.size() == words.size()) {
-                break;
-            }
+				break;
+			}
         }
         fillUnused();
     }
@@ -371,12 +422,12 @@ public class WordSearchPuzzle {
      * @see <code>sortLongestFirst</code>
      */
     public void addWords(ArrayList<String> input) {
-        input.add("java");
-        input.add("Limerick");
-        input.add("boolean");
-        input.add("stack");
-        input.add("binary");
-        input.add("python");
+        input.add("COMPILE");
+        input.add("ANDROID");
+        input.add("BOOLEAN");
+        input.add("STACK");
+        input.add("BINARY");
+        input.add("PYTHON");
         sortLongestFirst(input);
     }
 }
